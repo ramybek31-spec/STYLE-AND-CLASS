@@ -1,0 +1,6 @@
+{
+  "name": "STYLE AND CLASS | London Second-Hand Fashion",
+  "description": "London second-hand fashion boutique selling unique physical items with verified inventory, instant address QR code generation, and store management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
