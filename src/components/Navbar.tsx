@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { ShoppingBag, Search, ShieldCheck, Lock, Menu, X, ArrowRight, MessageSquare, Instagram, Facebook, Video } from "lucide-react";
+import { ShoppingBag, Search, ShieldCheck, Lock, Menu, X, ArrowRight, MessageSquare } from "lucide-react";
+import { TikTokBrandIcon, InstagramBrandIcon, FacebookBrandIcon } from "./BrandIcons";
 import { useCart } from "../context/CartContext";
 import { ProductCategory } from "../types";
 
@@ -53,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>WhatsApp: +44 7591 878215</span>
             </a>
             <span>&middot;</span>
-            <div className="flex items-center gap-2 text-stone-400">
+            <div className="flex items-center gap-2.5 text-stone-400">
               <a
                 href="https://www.instagram.com/danmark.uk?igsh=MXpsaXNib3JzcHFw"
                 target="_blank"
@@ -61,7 +62,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="hover:text-pink-400 transition"
                 title="Instagram @danmark.uk"
               >
-                <Instagram className="w-3.5 h-3.5" />
+                <InstagramBrandIcon className="w-3.5 h-3.5" />
               </a>
               <a
                 href="https://www.tiktok.com/@danmark.fashion5?_r=1&_t=ZN-98Dxx0gz2XO"
@@ -70,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="hover:text-cyan-400 transition"
                 title="TikTok @danmark.fashion5"
               >
-                <Video className="w-3.5 h-3.5" />
+                <TikTokBrandIcon className="w-3.5 h-3.5" />
               </a>
               <a
                 href="https://www.facebook.com/people/Dan-Danmark/61585382386134/?rdid=LStdMae3aAy4HdR3&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1DV7Qjem6m%2F"
@@ -79,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="hover:text-blue-400 transition"
                 title="Facebook Dan Danmark"
               >
-                <Facebook className="w-3.5 h-3.5" />
+                <FacebookBrandIcon className="w-3.5 h-3.5" />
               </a>
             </div>
             <span>&middot;</span>
@@ -245,7 +246,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-pink-600 font-medium"
               >
-                <Instagram className="w-4 h-4 text-pink-600" />
+                <InstagramBrandIcon className="w-4 h-4 text-pink-600" />
                 <span>Instagram</span>
               </a>
               <a
@@ -254,7 +255,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-cyan-600 font-medium"
               >
-                <Video className="w-4 h-4 text-cyan-600" />
+                <TikTokBrandIcon className="w-4 h-4 text-cyan-600" />
                 <span>TikTok</span>
               </a>
               <a
@@ -263,7 +264,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-blue-600 font-medium"
               >
-                <Facebook className="w-4 h-4 text-blue-600" />
+                <FacebookBrandIcon className="w-4 h-4 text-blue-600" />
                 <span>Facebook</span>
               </a>
             </div>

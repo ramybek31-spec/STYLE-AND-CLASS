@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from "react";
 import { Product, ProductCategory } from "../types";
-import { ProductCard } from "../components/ProductCard";
+import { ProductCard, ProductCardSkeleton } from "../components/ProductCard";
 import { Filter, X, SlidersHorizontal } from "lucide-react";
 
 interface CategoryPageProps {
   currentCategory: ProductCategory | "ALL";
   onSelectCategory: (cat: ProductCategory | "ALL") => void;
   products: Product[];
+  loading?: boolean;
   onSelectProduct: (product: Product) => void;
+  onQuickView?: (product: Product) => void;
   searchTerm: string;
   onClearSearch: () => void;
 }
@@ -16,7 +18,9 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
   currentCategory,
   onSelectCategory,
   products,
+  loading = false,
   onSelectProduct,
+  onQuickView,
   searchTerm,
   onClearSearch
 }) => {
@@ -179,13 +183,20 @@ export const CategoryPage: React.FC<CategoryPageProps> = ({
       </div>
 
       {/* Products Grid */}
-      {filteredProducts.length > 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <ProductCardSkeleton key={`cat-skeleton-${idx}`} />
+          ))}
+        </div>
+      ) : filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredProducts.map((prod) => (
             <ProductCard
               key={prod.id}
               product={prod}
               onSelectProduct={onSelectProduct}
+              onQuickView={onQuickView}
             />
           ))}
         </div>

@@ -1,7 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Product } from "../types";
 import { useCart } from "../context/CartContext";
-import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, QrCode, Sparkles, Check, Info, MessageSquare, Instagram, Video, Facebook } from "lucide-react";
+import { 
+  ArrowLeft, 
+  ShoppingBag, 
+  ShieldCheck, 
+  Truck, 
+  QrCode, 
+  Sparkles, 
+  Check, 
+  Info, 
+  MessageSquare,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  X,
+  RotateCcw
+} from "lucide-react";
+import { TikTokBrandIcon, InstagramBrandIcon, FacebookBrandIcon } from "../components/BrandIcons";
 
 interface ProductDetailPageProps {
   product: Product;
@@ -16,6 +32,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 }) => {
   const { addToCart, item } = useCart();
   const [selectedImage, setSelectedImage] = useState(product.main_image);
+  const [isHoveringZoom, setIsHoveringZoom] = useState(false);
+  const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 });
+  const [zoomLevel, setZoomLevel] = useState<number>(2.2);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [lightboxZoom, setLightboxZoom] = useState<number>(1);
 
   const isSold = product.is_sold === 1 || product.is_sold === true || product.status === "SOLD";
   const isInBasket = item?.id === product.id;
@@ -24,6 +45,59 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     product.main_image,
     ...(Array.isArray(product.additional_images) ? product.additional_images : [])
   ].filter(Boolean);
+
+  // Close lightbox on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isLightboxOpen) {
+        setIsLightboxOpen(false);
+      }
+    };
+    if (isLightboxOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [isLightboxOpen]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isSold) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomPosition({
+      x: Math.max(0, Math.min(100, x)),
+      y: Math.max(0, Math.min(100, y)),
+    });
+  };
+
+  const handleMouseEnter = () => {
+    if (!isSold) {
+      setIsHoveringZoom(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHoveringZoom(false);
+    setZoomPosition({ x: 50, y: 50 });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (isSold || !e.touches[0]) return;
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((touch.clientX - rect.left) / rect.width) * 100;
+    const y = ((touch.clientY - rect.top) / rect.height) * 100;
+    setZoomPosition({
+      x: Math.max(0, Math.min(100, x)),
+      y: Math.max(0, Math.min(100, y)),
+    });
+  };
 
   const handleAddToCart = () => {
     if (!isSold) {
@@ -52,26 +126,109 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Left Gallery Column (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="relative aspect-[4/5] bg-stone-100 rounded-lg overflow-hidden border border-stone-200">
+          <div 
+            className={`relative aspect-[4/5] bg-stone-100 rounded-lg overflow-hidden border border-stone-200 select-none ${
+              isSold ? "cursor-default" : isHoveringZoom ? "cursor-crosshair" : "cursor-zoom-in"
+            }`}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            onTouchMove={handleTouchMove}
+            onTouchStart={handleMouseEnter}
+            onTouchEnd={handleMouseLeave}
+            onClick={() => !isSold && setIsLightboxOpen(true)}
+            title={!isSold ? "Click for full-screen inspection" : undefined}
+          >
             <img
               src={selectedImage}
               alt={product.name}
-              className={`w-full h-full object-cover object-center ${
-                isSold ? "grayscale contrast-75 opacity-70" : ""
-              }`}
+              style={{
+                transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+                transform: isHoveringZoom ? `scale(${zoomLevel})` : "scale(1)",
+              }}
+              className={`w-full h-full object-cover object-center pointer-events-none transition-transform will-change-transform ${
+                isHoveringZoom ? "duration-75 ease-out" : "duration-300 ease-in-out"
+              } ${isSold ? "grayscale contrast-75 opacity-70" : ""}`}
             />
 
             {/* 1-of-1 Badge */}
             {!isSold && (
-              <div className="absolute top-4 left-4 bg-[#1c1917]/90 text-white text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded shadow-sm flex items-center gap-1.5">
+              <div className="absolute top-4 left-4 bg-[#1c1917]/90 text-white text-xs font-semibold tracking-widest uppercase px-3 py-1 rounded shadow-sm flex items-center gap-1.5 pointer-events-none z-10">
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 <span>Unique 1-of-1 Piece</span>
               </div>
             )}
 
+            {/* Top Right Zoom Controls & Fullscreen Lightbox Button */}
+            {!isSold && (
+              <div 
+                className="absolute top-4 right-4 flex items-center gap-1.5 z-20"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Zoom Level Switcher */}
+                <div className="bg-[#1c1917]/85 backdrop-blur-xs rounded-md p-0.5 flex items-center text-[10px] text-stone-300 border border-stone-700/60 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setZoomLevel(2.0)}
+                    className={`px-2 py-0.5 rounded font-mono font-medium transition ${
+                      zoomLevel === 2.0 ? "bg-amber-400 text-stone-950 font-bold" : "hover:text-white"
+                    }`}
+                    title="2x Zoom Magnification"
+                  >
+                    2.0x
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setZoomLevel(2.8)}
+                    className={`px-2 py-0.5 rounded font-mono font-medium transition ${
+                      zoomLevel === 2.8 ? "bg-amber-400 text-stone-950 font-bold" : "hover:text-white"
+                    }`}
+                    title="2.8x Ultra-Detail Zoom"
+                  >
+                    2.8x
+                  </button>
+                </div>
+
+                {/* Lightbox Trigger */}
+                <button
+                  type="button"
+                  onClick={() => setIsLightboxOpen(true)}
+                  className="p-1.5 bg-[#1c1917]/85 hover:bg-stone-900 text-stone-300 hover:text-white rounded-md border border-stone-700/60 shadow-sm transition backdrop-blur-xs flex items-center justify-center"
+                  title="Open Fullscreen Fabric Inspection"
+                  aria-label="Open Fullscreen Fabric Inspection"
+                >
+                  <Maximize2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* Bottom-Right Zoom Feedback Pill */}
+            {!isSold && (
+              <div className="absolute bottom-4 right-4 pointer-events-none z-10 transition-all duration-200">
+                {isHoveringZoom ? (
+                  <div className="bg-[#1c1917]/90 text-amber-300 text-[11px] font-mono font-semibold px-3 py-1 rounded-full shadow-lg border border-amber-400/30 flex items-center gap-1.5 backdrop-blur-xs animate-in fade-in">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                    <span>Inspecting Fabric &middot; {zoomLevel}x</span>
+                  </div>
+                ) : (
+                  <div className="bg-[#1c1917]/75 hover:bg-[#1c1917]/90 text-white text-[11px] font-medium px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5 backdrop-blur-xs border border-white/10">
+                    <ZoomIn className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Hover to examine fabric quality</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Condition Tag on Image */}
+            {!isSold && product.condition && (
+              <div className="absolute bottom-4 left-4 bg-white/95 text-stone-900 text-[11px] font-medium px-2.5 py-1 rounded shadow-xs border border-stone-200 pointer-events-none z-10">
+                {product.condition}
+              </div>
+            )}
+
             {/* SOLD Overlay */}
             {isSold && (
-              <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-[2px] flex items-center justify-center p-6">
+              <div className="absolute inset-0 bg-stone-900/60 backdrop-blur-[2px] flex items-center justify-center p-6 z-20">
                 <div className="border-4 border-white px-8 py-3 text-white font-serif tracking-[0.3em] text-3xl font-bold uppercase rotate-[-8deg] shadow-2xl">
                   SOLD
                 </div>
@@ -257,7 +414,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-stone-300 rounded text-[11px] font-medium text-stone-700 hover:text-pink-600 hover:border-pink-300 transition"
                 >
-                  <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                  <InstagramBrandIcon className="w-3.5 h-3.5 text-pink-600" />
                   <span>@danmark.uk</span>
                 </a>
                 <a
@@ -266,7 +423,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-stone-300 rounded text-[11px] font-medium text-stone-700 hover:text-cyan-600 hover:border-cyan-300 transition"
                 >
-                  <Video className="w-3.5 h-3.5 text-cyan-600" />
+                  <TikTokBrandIcon className="w-3.5 h-3.5 text-cyan-600" />
                   <span>@danmark.fashion5</span>
                 </a>
                 <a
@@ -275,7 +432,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-stone-300 rounded text-[11px] font-medium text-stone-700 hover:text-blue-600 hover:border-blue-300 transition"
                 >
-                  <Facebook className="w-3.5 h-3.5 text-blue-600" />
+                  <FacebookBrandIcon className="w-3.5 h-3.5 text-blue-600" />
                   <span>Dan Danmark</span>
                 </a>
               </div>
@@ -283,6 +440,116 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Fabric & Stitching Inspection Lightbox */}
+      {isLightboxOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6 animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsLightboxOpen(false);
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="High-Definition Garment Inspection Lightbox"
+        >
+          {/* Lightbox Top Header */}
+          <div className="flex items-center justify-between text-white border-b border-stone-800 pb-3 shrink-0">
+            <div>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-amber-400 font-semibold block">
+                Archival Garment Inspection
+              </span>
+              <h3 className="text-sm sm:text-base font-serif font-bold text-stone-100 truncate max-w-md">
+                {product.name}
+              </h3>
+            </div>
+
+            {/* Inspection Controls & Close */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center bg-stone-900 border border-stone-800 rounded-lg p-1 text-xs">
+                <button
+                  onClick={() => setLightboxZoom((prev) => Math.max(1, prev - 0.5))}
+                  className="p-1.5 hover:bg-stone-800 text-stone-300 hover:text-white rounded transition"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <span className="px-2 font-mono text-[11px] text-amber-400 min-w-12 text-center">
+                  {lightboxZoom.toFixed(1)}x
+                </span>
+                <button
+                  onClick={() => setLightboxZoom((prev) => Math.min(3.5, prev + 0.5))}
+                  className="p-1.5 hover:bg-stone-800 text-stone-300 hover:text-white rounded transition"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setLightboxZoom(1)}
+                  className="p-1.5 hover:bg-stone-800 text-stone-400 hover:text-white rounded border-l border-stone-800 ml-1 transition"
+                  title="Reset Zoom"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              <button
+                onClick={() => setIsLightboxOpen(false)}
+                className="p-2 bg-stone-900 hover:bg-stone-800 text-stone-400 hover:text-white rounded-lg border border-stone-800 transition"
+                aria-label="Close Inspection Lightbox"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Lightbox Center Image View */}
+          <div 
+            className="flex-grow flex items-center justify-center overflow-hidden my-4 relative select-none cursor-grab active:cursor-grabbing"
+            onClick={() => setLightboxZoom((prev) => (prev > 1.2 ? 1 : 2.2))}
+            title="Click to toggle 2.2x zoom"
+          >
+            <div 
+              className="transition-transform duration-200 ease-out max-w-full max-h-full flex items-center justify-center"
+              style={{ transform: `scale(${lightboxZoom})` }}
+            >
+              <img
+                src={selectedImage}
+                alt={product.name}
+                className="max-h-[75vh] max-w-full object-contain rounded shadow-2xl"
+              />
+            </div>
+          </div>
+
+          {/* Lightbox Bottom Thumbnails & Instructions */}
+          <div className="shrink-0 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-stone-800 pt-3 text-xs text-stone-400">
+            <span className="text-[11px] hidden sm:inline text-stone-500">
+              Click image to toggle zoom &bull; Use zoom buttons for up to 3.5x magnification &bull; Press Esc to close
+            </span>
+
+            {/* Thumbnail switcher */}
+            {allImages.length > 1 && (
+              <div className="flex gap-2 mx-auto sm:mx-0 overflow-x-auto pb-1">
+                {allImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setSelectedImage(img);
+                      setLightboxZoom(1);
+                    }}
+                    className={`w-12 h-14 rounded border overflow-hidden shrink-0 transition ${
+                      selectedImage === img
+                        ? "border-amber-400 ring-2 ring-amber-400/40 opacity-100"
+                        : "border-stone-800 opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

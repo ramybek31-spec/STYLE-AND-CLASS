@@ -1,19 +1,24 @@
 import React from "react";
 import { Product, ProductCategory } from "../types";
-import { ProductCard } from "../components/ProductCard";
+import { ProductCard, ProductCardSkeleton } from "../components/ProductCard";
 import { HeroSlideshow } from "../components/HeroSlideshow";
+import { CustomerTestimonials } from "../components/CustomerTestimonials";
 import { ArrowRight, ShieldCheck, Truck, QrCode } from "lucide-react";
 
 interface HomePageProps {
   products: Product[];
+  loading?: boolean;
   onSelectProduct: (product: Product) => void;
   onSelectCategory: (cat: ProductCategory | "ALL") => void;
+  onQuickView?: (product: Product) => void;
 }
 
 export const HomePage: React.FC<HomePageProps> = ({
   products,
+  loading = false,
   onSelectProduct,
-  onSelectCategory
+  onSelectCategory,
+  onQuickView
 }) => {
   const availableProducts = products.filter((p) => !p.is_sold && p.status !== "SOLD");
   const newArrivals = availableProducts.slice(0, 6);
@@ -167,15 +172,25 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {newArrivals.map((prod) => (
-            <ProductCard
-              key={prod.id}
-              product={prod}
-              onSelectProduct={onSelectProduct}
-            />
-          ))}
+          {loading ? (
+            Array.from({ length: 6 }).map((_, idx) => (
+              <ProductCardSkeleton key={`home-skeleton-${idx}`} />
+            ))
+          ) : (
+            newArrivals.map((prod) => (
+              <ProductCard
+                key={prod.id}
+                product={prod}
+                onSelectProduct={onSelectProduct}
+                onQuickView={onQuickView}
+              />
+            ))
+          )}
         </div>
       </section>
+
+      {/* Verified London Boutique Customer Feedback Carousel */}
+      <CustomerTestimonials />
     </div>
   );
 };

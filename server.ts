@@ -32,6 +32,18 @@ async function startServer() {
   app.use("/api/webhooks/paypal", paypalRouter);
   app.use("/api/admin", adminRouter);
 
+  // Store contact & WhatsApp configuration
+  app.get("/api/config/contact", (req, res) => {
+    const whatsappPhone =
+      process.env.MANAGER_WHATSAPP_PHONE ||
+      process.env.VITE_MANAGER_WHATSAPP_PHONE ||
+      "+447591878215";
+    res.json({
+      whatsappPhone,
+      email: process.env.MANAGER_EMAIL || "manager@styleandclass.co.uk"
+    });
+  });
+
   // Health check endpoint
   app.get("/api/health", (req, res) => {
     res.json({

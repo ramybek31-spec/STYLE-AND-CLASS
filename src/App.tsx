@@ -10,14 +10,20 @@ import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { CheckoutPage } from "./pages/CheckoutPage";
 import { OrderConfirmationPage } from "./pages/OrderConfirmationPage";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { LegalModal, LegalPolicyType } from "./components/LegalModal";
+import { ProductQuickViewModal } from "./components/ProductQuickViewModal";
+import { ScrollToTopButton } from "./components/ScrollToTopButton";
+import { FloatingWhatsAppButton } from "./components/FloatingWhatsAppButton";
 
 function MainContent() {
   const [view, setView] = useState<"HOME" | "CATEGORY" | "PRODUCT_DETAIL" | "CHECKOUT" | "ORDER_CONFIRMATION">("HOME");
   const [currentCategory, setCurrentCategory] = useState<ProductCategory | "ALL">("ALL");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [completedOrderData, setCompletedOrderData] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAdmin, setShowAdmin] = useState(false);
+  const [activePolicy, setActivePolicy] = useState<LegalPolicyType | null>(null);
 
   // Products loaded from server database
   const [products, setProducts] = useState<Product[]>([]);
@@ -84,66 +90,59 @@ function MainContent() {
 
       {/* Main Page Router */}
       <main className="flex-1">
-        {loadingProducts ? (
-          <div className="max-w-7xl mx-auto px-4 py-24 text-center space-y-3">
-            <div className="w-8 h-8 border-2 border-stone-800 border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-xs uppercase tracking-widest text-stone-500 font-medium">
-              Loading London Boutique Catalogue...
-            </p>
-          </div>
-        ) : (
-          <>
-            {view === "HOME" && (
-              <HomePage
-                products={products}
-                onSelectProduct={handleSelectProduct}
-                onSelectCategory={handleSelectCategory}
-              />
-            )}
+        {view === "HOME" && (
+          <HomePage
+            products={products}
+            loading={loadingProducts}
+            onSelectProduct={handleSelectProduct}
+            onSelectCategory={handleSelectCategory}
+            onQuickView={(prod) => setQuickViewProduct(prod)}
+          />
+        )}
 
-            {view === "CATEGORY" && (
-              <CategoryPage
-                currentCategory={currentCategory}
-                onSelectCategory={setCurrentCategory}
-                products={products}
-                onSelectProduct={handleSelectProduct}
-                searchTerm={searchTerm}
-                onClearSearch={() => setSearchTerm("")}
-              />
-            )}
+        {view === "CATEGORY" && (
+          <CategoryPage
+            currentCategory={currentCategory}
+            onSelectCategory={setCurrentCategory}
+            products={products}
+            loading={loadingProducts}
+            onSelectProduct={handleSelectProduct}
+            onQuickView={(prod) => setQuickViewProduct(prod)}
+            searchTerm={searchTerm}
+            onClearSearch={() => setSearchTerm("")}
+          />
+        )}
 
-            {view === "PRODUCT_DETAIL" && selectedProduct && (
-              <ProductDetailPage
-                product={selectedProduct}
-                onBack={() => setView("CATEGORY")}
-                onBuyNow={() => setView("CHECKOUT")}
-              />
-            )}
+        {view === "PRODUCT_DETAIL" && selectedProduct && (
+          <ProductDetailPage
+            product={selectedProduct}
+            onBack={() => setView("CATEGORY")}
+            onBuyNow={() => setView("CHECKOUT")}
+          />
+        )}
 
-            {view === "CHECKOUT" && (
-              <CheckoutPage
-                onBack={() => {
-                  if (selectedProduct) {
-                    setView("PRODUCT_DETAIL");
-                  } else {
-                    setView("HOME");
-                  }
-                }}
-                onOrderSuccess={handleOrderSuccess}
-              />
-            )}
+        {view === "CHECKOUT" && (
+          <CheckoutPage
+            onBack={() => {
+              if (selectedProduct) {
+                setView("PRODUCT_DETAIL");
+              } else {
+                setView("HOME");
+              }
+            }}
+            onOrderSuccess={handleOrderSuccess}
+          />
+        )}
 
-            {view === "ORDER_CONFIRMATION" && completedOrderData && (
-              <OrderConfirmationPage
-                orderData={completedOrderData}
-                onReturnHome={() => {
-                  setView("HOME");
-                  setSelectedProduct(null);
-                  setCompletedOrderData(null);
-                }}
-              />
-            )}
-          </>
+        {view === "ORDER_CONFIRMATION" && completedOrderData && (
+          <OrderConfirmationPage
+            orderData={completedOrderData}
+            onReturnHome={() => {
+              setView("HOME");
+              setSelectedProduct(null);
+              setCompletedOrderData(null);
+            }}
+          />
         )}
       </main>
 
@@ -156,7 +155,26 @@ function MainContent() {
       />
 
       {/* Official London Boutique Footer */}
-      <Footer onOpenAdmin={() => setShowAdmin(true)} />
+      <Footer 
+        onOpenAdmin={() => setShowAdmin(true)} 
+        onOpenPolicy={(policy) => setActivePolicy(policy)}
+      />
+
+      {/* Official Boutique Legal Policy Modal */}
+      <LegalModal 
+        policy={activePolicy} 
+        onClose={() => setActivePolicy(null)} 
+      />
+
+      {/* Product Quick View Modal */}
+      <ProductQuickViewModal
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        onViewFullDetails={(prod) => {
+          handleSelectProduct(prod);
+          setQuickViewProduct(null);
+        }}
+      />
 
       {/* Admin Store Manager Modal */}
       {showAdmin && (
@@ -167,6 +185,12 @@ function MainContent() {
           }}
         />
       )}
+
+      {/* Navigation Efficiency: Scroll to Top Floating Action */}
+      <ScrollToTopButton threshold={350} />
+
+      {/* Floating Concierge: Direct WhatsApp Message Button */}
+      <FloatingWhatsAppButton />
     </div>
   );
 }
