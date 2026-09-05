@@ -112,13 +112,33 @@ export function buildManagerSaleReportText(data: SaleNotificationPayload): strin
 }
 
 /**
+ * Normalizes and cleans WhatsApp phone numbers, particularly handling UK international format.
+ * Examples: "+44 07591878215", "+447591878215", "07591 878215" -> "+447591878215"
+ */
+export function sanitizeWhatsAppPhone(phone: string): string {
+  if (!phone) return "+447591878215";
+  let cleaned = phone.replace(/[\s\-()]/g, "").trim();
+  // Handle UK trunk prefix removal in international format: +4407... -> +447...
+  if (cleaned.startsWith("+440")) {
+    cleaned = "+44" + cleaned.slice(4);
+  } else if (cleaned.startsWith("440")) {
+    cleaned = "+44" + cleaned.slice(3);
+  } else if (cleaned.startsWith("07") && cleaned.length === 11) {
+    cleaned = "+44" + cleaned.slice(1);
+  } else if (!cleaned.startsWith("+") && cleaned.startsWith("44")) {
+    cleaned = "+" + cleaned;
+  }
+  return cleaned;
+}
+
+/**
  * Generates the WhatsApp Direct Dispatch link (Mode A - Manual-Prepared Mode).
  */
 export function generateWhatsAppUrl(managerPhone: string, messageText: string): string {
-  // Strip non-digits from phone, ensure country code
-  const cleanPhone = managerPhone.replace(/[^\d+]/g, "").replace(/^\+/, "");
+  const sanitized = sanitizeWhatsAppPhone(managerPhone || "+447591878215");
+  const cleanDigits = sanitized.replace(/[^\d]/g, "");
   const encodedText = encodeURIComponent(messageText);
-  return `https://wa.me/${cleanPhone}?text=${encodedText}`;
+  return `https://wa.me/${cleanDigits}?text=${encodedText}`;
 }
 
 export class NotificationService {

@@ -77,7 +77,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   // Store Manager Notification Settings State
-  const [managerPhoneInput, setManagerPhoneInput] = useState("+447911123456");
+  const [managerPhoneInput, setManagerPhoneInput] = useState("+447591878215");
   const [managerEmailInput, setManagerEmailInput] = useState("manager@styleandclass.co.uk");
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
@@ -913,13 +913,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                     type="text"
                     value={managerPhoneInput}
                     onChange={(e) => setManagerPhoneInput(e.target.value)}
-                    placeholder="+447911123456"
+                    placeholder="+44 7591 878215"
                     className="w-full pl-9 pr-3 py-2 text-sm font-mono border border-stone-300 rounded focus:ring-1 focus:ring-stone-900 focus:outline-none"
                   />
                   <Phone className="w-4 h-4 text-stone-400 absolute left-3 top-2.5" />
                 </div>
                 <p className="text-[11px] text-stone-500 leading-relaxed">
-                  Used for Mode A instant 1-click WhatsApp dispatch links and direct courier report forwarding.
+                  Used for Mode A instant 1-click WhatsApp dispatch links and direct courier report forwarding to store manager (+44 7591 878215).
                 </p>
               </div>
 
@@ -955,7 +955,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onClose }) => {
                   </button>
 
                   <a
-                    href={`https://wa.me/${managerPhoneInput.replace(/[^\d+]/g, "").replace(/^\+/, "")}?text=${encodeURIComponent("STYLE AND CLASS (London Mayfair) - Test dispatch connection to store manager WhatsApp.")}`}
+                    href={`https://wa.me/${managerPhoneInput.replace(/[\s\-()]/g, "").replace(/^\+/, "").replace(/^440/, "44").replace(/^07/, "447")}?text=${encodeURIComponent("STYLE AND CLASS (London Mayfair) - Test dispatch connection to store manager WhatsApp.")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded text-xs font-semibold uppercase tracking-wider inline-flex items-center gap-1.5 transition"

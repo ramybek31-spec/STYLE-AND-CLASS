@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Product } from "../types";
 import { useCart } from "../context/CartContext";
-import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, QrCode, Sparkles, Check, Info } from "lucide-react";
+import { ArrowLeft, ShoppingBag, ShieldCheck, Truck, QrCode, Sparkles, Check, Info, MessageSquare, Instagram, Video, Facebook } from "lucide-react";
 
 interface ProductDetailPageProps {
   product: Product;
@@ -187,6 +187,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     </>
                   )}
                 </button>
+
+                <a
+                  href={`https://wa.me/447591878215?text=${encodeURIComponent(`Hello STYLE AND CLASS London, I am inquiring about piece: ${product.name} (SKU: ${product.sku}, £${product.price}). Is it currently available for viewing or dispatch?`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-4 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300/80 font-medium text-xs tracking-wide transition flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="w-4 h-4 text-emerald-600" />
+                  <span>Enquire on WhatsApp (+44 7591 878215)</span>
+                </a>
               </div>
             )}
           </div>
@@ -228,6 +238,48 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <p className="text-[11px] leading-relaxed text-stone-500">
               A free delivery address QR code is automatically generated on our server to verify accurate courier delivery to your doorstep.
             </p>
+          </div>
+
+          {/* Social styling & video try-on links */}
+          <div className="border-t border-stone-200 pt-4">
+            <div className="bg-stone-50 p-3.5 rounded-lg border border-stone-200/80">
+              <div className="text-[11px] font-semibold text-stone-800 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                <span>See Styling &amp; Live Drops</span>
+                <span className="text-[10px] text-stone-500 font-normal">Daily Video Updates</span>
+              </div>
+              <p className="text-[11px] text-stone-500 leading-relaxed mb-3">
+                Watch video try-ons, styling reels, and new boutique arrivals on our official social channels:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href="https://www.instagram.com/danmark.uk?igsh=MXpsaXNib3JzcHFw"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-stone-300 rounded text-[11px] font-medium text-stone-700 hover:text-pink-600 hover:border-pink-300 transition"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                  <span>@danmark.uk</span>
+                </a>
+                <a
+                  href="https://www.tiktok.com/@danmark.fashion5?_r=1&_t=ZN-98Dxx0gz2XO"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-stone-300 rounded text-[11px] font-medium text-stone-700 hover:text-cyan-600 hover:border-cyan-300 transition"
+                >
+                  <Video className="w-3.5 h-3.5 text-cyan-600" />
+                  <span>@danmark.fashion5</span>
+                </a>
+                <a
+                  href="https://www.facebook.com/people/Dan-Danmark/61585382386134/?rdid=LStdMae3aAy4HdR3&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1DV7Qjem6m%2F"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-white border border-stone-300 rounded text-[11px] font-medium text-stone-700 hover:text-blue-600 hover:border-blue-300 transition"
+                >
+                  <Facebook className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Dan Danmark</span>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

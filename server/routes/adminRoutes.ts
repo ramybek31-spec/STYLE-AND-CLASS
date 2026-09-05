@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { getDb, persistDb } from "../db";
 import { requireAdminAuth, signAdminToken, ADMIN_PASSWORD, recordAuditLog } from "../auth";
 import { generateDeliveryQrCode } from "../qr";
-import { NotificationService, buildManagerSaleReportText, generateWhatsAppUrl, formatLondonDateTime } from "../notifications";
+import { NotificationService, buildManagerSaleReportText, generateWhatsAppUrl, formatLondonDateTime, sanitizeWhatsAppPhone } from "../notifications";
 import { getPayPalConfig } from "../paypal";
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,12 +16,12 @@ export async function getManagerWhatsAppPhone(): Promise<string> {
     const db = await getDb();
     const res = db.exec("SELECT value FROM settings WHERE key = 'MANAGER_WHATSAPP_PHONE';");
     if (res && res[0] && res[0].values[0] && res[0].values[0][0]) {
-      return String(res[0].values[0][0]);
+      return sanitizeWhatsAppPhone(String(res[0].values[0][0]));
     }
   } catch (err) {
     console.error("Error retrieving manager phone setting:", err);
   }
-  return process.env.MANAGER_WHATSAPP_PHONE || "+447911123456";
+  return sanitizeWhatsAppPhone(process.env.MANAGER_WHATSAPP_PHONE || "+447591878215");
 }
 
 /**
@@ -543,7 +543,7 @@ adminRouter.put("/settings", requireAdminAuth, async (req: Request, res: Respons
     const { managerPhone, managerEmail } = req.body;
 
     if (managerPhone !== undefined) {
-      const cleanedPhone = String(managerPhone).trim();
+      const cleanedPhone = sanitizeWhatsAppPhone(String(managerPhone).trim());
       db.run(`
         INSERT INTO settings (key, value) VALUES ('MANAGER_WHATSAPP_PHONE', '${cleanedPhone.replace(/'/g, "''")}')
         ON CONFLICT(key) DO UPDATE SET value = '${cleanedPhone.replace(/'/g, "''")}';

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ShoppingBag, Search, ShieldCheck, Lock, Menu, X, ArrowRight } from "lucide-react";
+import { ShoppingBag, Search, ShieldCheck, Lock, Menu, X, ArrowRight, MessageSquare, Instagram, Facebook, Video } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { ProductCategory } from "../types";
 
@@ -42,7 +42,46 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>London Boutique &middot; 100% Unique Second-Hand Pieces &middot; 1 Item = 1 Physical Sale</span>
           </div>
           <div className="hidden md:flex items-center gap-4 text-stone-300">
-            <span>Fast UK Courier Dispatch: Evri, Royal Mail, InPost</span>
+            <a
+              href="https://wa.me/447591878215?text=Hello%20STYLE%20AND%20CLASS%20London%2C%20I%20have%20an%20enquiry%20regarding%20a%20piece."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white flex items-center gap-1.5 transition text-emerald-400 font-mono text-[11px]"
+              title="Chat with Store Manager on WhatsApp"
+            >
+              <MessageSquare className="w-3 h-3 text-emerald-400" />
+              <span>WhatsApp: +44 7591 878215</span>
+            </a>
+            <span>&middot;</span>
+            <div className="flex items-center gap-2 text-stone-400">
+              <a
+                href="https://www.instagram.com/danmark.uk?igsh=MXpsaXNib3JzcHFw"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-pink-400 transition"
+                title="Instagram @danmark.uk"
+              >
+                <Instagram className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href="https://www.tiktok.com/@danmark.fashion5?_r=1&_t=ZN-98Dxx0gz2XO"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-cyan-400 transition"
+                title="TikTok @danmark.fashion5"
+              >
+                <Video className="w-3.5 h-3.5" />
+              </a>
+              <a
+                href="https://www.facebook.com/people/Dan-Danmark/61585382386134/?rdid=LStdMae3aAy4HdR3&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1DV7Qjem6m%2F"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-blue-400 transition"
+                title="Facebook Dan Danmark"
+              >
+                <Facebook className="w-3.5 h-3.5" />
+              </a>
+            </div>
             <span>&middot;</span>
             <button
               onClick={onOpenAdmin}
@@ -172,7 +211,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               {cat.label}
             </button>
           ))}
-          <div className="pt-3 border-t border-stone-200">
+          <div className="pt-3 border-t border-stone-200 space-y-2">
+            <a
+              href="https://wa.me/447591878215?text=Hello%20STYLE%20AND%20CLASS%20London%2C%20I%20have%20an%20enquiry%20regarding%20a%20piece."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-between text-xs py-2 px-3 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded font-medium"
+            >
+              <span className="flex items-center gap-2">
+                <MessageSquare className="w-3.5 h-3.5 text-emerald-600" /> WhatsApp Store Concierge
+              </span>
+              <span className="font-mono text-[11px]">+44 7591 878215</span>
+            </a>
+
             <button
               onClick={() => {
                 onOpenAdmin();
@@ -185,6 +236,37 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
               <ArrowRight className="w-3 h-3" />
             </button>
+
+            {/* Social channels row in mobile menu */}
+            <div className="pt-2 border-t border-stone-200 flex items-center justify-around py-1">
+              <a
+                href="https://www.instagram.com/danmark.uk?igsh=MXpsaXNib3JzcHFw"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-pink-600 font-medium"
+              >
+                <Instagram className="w-4 h-4 text-pink-600" />
+                <span>Instagram</span>
+              </a>
+              <a
+                href="https://www.tiktok.com/@danmark.fashion5?_r=1&_t=ZN-98Dxx0gz2XO"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-cyan-600 font-medium"
+              >
+                <Video className="w-4 h-4 text-cyan-600" />
+                <span>TikTok</span>
+              </a>
+              <a
+                href="https://www.facebook.com/people/Dan-Danmark/61585382386134/?rdid=LStdMae3aAy4HdR3&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1DV7Qjem6m%2F"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs text-stone-600 hover:text-blue-600 font-medium"
+              >
+                <Facebook className="w-4 h-4 text-blue-600" />
+                <span>Facebook</span>
+              </a>
+            </div>
           </div>
         </div>
       )}
